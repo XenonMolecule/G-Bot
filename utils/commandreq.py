@@ -70,8 +70,3 @@ class CommandRequest(object):
                 params.append(x)
 
         return type, params
-
-test = CommandRequest('!test \\"Hello World\\" "Hello World" Hello "World of Hellos"')
-test = CommandRequest('!test "Do not split" split me "not me though"')
-# print(test.recursive_remove_escape_chars("\\", '"', '\\"Hello World\\"\\'.split('"'), 0))
-# print(test.recursive_remove_escape_chars("\\", '"', [], 0))

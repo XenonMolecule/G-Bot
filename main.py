@@ -1,9 +1,20 @@
 import discord
 import asyncio
+from commands.gwhat import GWhat
+from utils.commandreq import CommandRequest
 
 CMD_CHAR = "!"
 
+command_list = [GWhat()]
+command_names = [x.name for x in command_list]
+
 client = discord.Client()
+
+def get_token():
+    token_file = open("private/token.txt")
+    token = token_file.readline()[:-1]
+    token_file.close()
+    return token
 
 @client.event
 async def on_ready():
@@ -14,16 +25,9 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    if message.content.startswith('!test'):
-        counter = 0
-        tmp = await client.send_message(message.channel, 'Calculating messages...')
-        async for log in client.logs_from(message.channel, limit=100):
-            if log.author == message.author:
-                counter += 1
+    if message.content.startswith(CMD_CHAR):
+        req = CommandRequest(message.content)
+        cmd_index = (command_names.index(req.type) if req.type in command_names else None)
+        await command_list[cmd_index].run(client, message, req.type, req.params)
 
-        await client.edit_message(tmp, 'You have {} messages.'.format(counter))
-    elif message.content.startswith('!sleep'):
-        await asyncio.sleep(5)
-        await client.send_message(message.channel, 'Done sleeping')
-
-client.run('token')
+client.run(get_token())
