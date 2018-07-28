@@ -1,10 +1,9 @@
 class CommandRequest(object):
     def __init__(self, message):
-        pass #self.type, self.params = self.parse_message(message)
+        self.type, self.params = self.parse_message(message)
 
     # Recursively find strings in list to bond back together using the ending escape characters
     def recursive_remove_escape_chars(self, char, split_char, search_list, length):
-        print(search_list)
         # If the line ends in the escape characters and isn't the end of the list
         #  Utilizes short circuiting
         if(not len(search_list) <= 1 and search_list[0][(-1 * len(char)):] == char):
@@ -14,11 +13,28 @@ class CommandRequest(object):
             output = self.recursive_remove_escape_chars(char, split_char, search_list[1:], length+1)
             return search_list[0] + output[0], output[1]
         # No escape char, or at list's end -- just return the current string
-        if(len(search_list) > 0):
+        if(len(search_list) > 0 and length == 0):
             return search_list[0], length
         else:
             return "", length
 
+    def splt_with_escp_chars(self, string, splt_char, escp_char):
+        msg_splt = string.split(splt_char)
+        delete_indices = []
+        skp_len = 0
+        for i in range(len(msg_splt)):
+            # Ensure no repeats after escape character combines
+            if(skp_len > 0):
+                msg_splt[i] = ""
+                delete_indices.append(i)
+                skp_len -= 1
+                continue
+            # Unsplit parts with escape characters
+            msg_splt, skp_len = self.recursive_remove_escape_chars("\\", '"', msg_splt[i:], 0)
+            skp_len -= 1
+        for i in range(len(delete_indices)):
+            del msg_splt[delete_indices[i]]
+        return msg_splt
 
 
     def parse_message(self, message):
@@ -28,21 +44,23 @@ class CommandRequest(object):
             type = message[1:].split(" ")[0]
 
         # Remove type part
-        message = message[len(type):]
+        message = message[len(type)+2:]
 
         # Process Quote Blocks
         quote_splt = message.split('"')
         skp_len = 0
         for i in range(len(quote_splt)):
+            # Ensure no repeats after escape character combines
             if(skp_len > 0):
-                quote_splt[i] = 0
+                quote_splt[i] = ""
                 skp_len -= 1
+                continue
             # Escape Characters - Must Unsplit
-            if(quote_splt[i][-1:] == "\\" and not i == new_len-1):
-                quote_splt[i] = quote_splt[i][0:-1]
-                quote_splt[i] += '"' + quote_splt[i+1]
-                new_len -= 1
+            quote_splt[i], skp_len = self.recursive_remove_escape_chars("\\", '"', quote_splt[i:], 0)
+            skp_len -= 1
+        print(quote_splt)
+        return "", ""
 
-test = CommandRequest("")
-print(test.recursive_remove_escape_chars("\\", '"', '\\"Hello World\\"\\'.split('"'), 0))
-print(test.recursive_remove_escape_chars("\\", '"', [], 0))
+test = CommandRequest('!test \\"Hello World\\" "Hello World"')
+# print(test.recursive_remove_escape_chars("\\", '"', '\\"Hello World\\"\\'.split('"'), 0))
+# print(test.recursive_remove_escape_chars("\\", '"', [], 0))
