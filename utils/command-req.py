@@ -1,6 +1,16 @@
+import collections
+
 class CommandRequest(object):
     def __init__(self, message):
         self.type, self.params = self.parse_message(message)
+
+    # Thank you: @Christian from Stack Overflow -- https://stackoverflow.com/questions/2158395/flatten-an-irregular-list-of-lists/2158532#2158532
+    def flatten_list(self, l):
+        for el in l:
+            if isinstance(el, collections.Iterable) and not isinstance(el, (str, bytes)):
+                yield from self.flatten_list(el)
+            else:
+                yield el
 
     # Recursively find strings in list to bond back together using the ending escape characters
     def recursive_remove_escape_chars(self, char, split_char, search_list, length):
@@ -47,9 +57,19 @@ class CommandRequest(object):
         message = message[len(type)+2:]
 
         # Process Quote Blocks
-        quote_splt = self.splt_with_escp_chars(message, '"', "\\")
-        print(quote_splt)
-        return "", ""
+        msg_splt = self.splt_with_escp_chars(message, '"', "\\")
+
+        # Every other section should be split by spaces (every other because quote split)
+        spce_split_indices = [x for x in range(len(msg_splt)) if x%2 == 0]
+        for i in spce_split_indices:
+            msg_splt[i] = self.splt_with_escp_chars(msg_splt[i], " ", "\\")
+
+        params = []
+        for x in self.flatten_list(msg_splt):
+            if(not x == ""):
+                params.append(x)
+
+        return type, params
 
 test = CommandRequest('!test \\"Hello World\\" "Hello World" Hello "World of Hellos"')
 test = CommandRequest('!test "Do not split" split me "not me though"')
