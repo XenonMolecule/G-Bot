@@ -7,5 +7,5 @@ class GWhat(Command):
     async def run(self, client, message, type, params):
         await client.send_message(message.channel, "GSET")
 
-    async def help(self):
-        await client.send_message(message.channel, self.name + "usage: !gwhat")
+    async def help(self, client, message):
+        await client.send_message(message.channel, self.name + " usage: `!gwhat`")

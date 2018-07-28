@@ -9,9 +9,9 @@ class Command(object):
     async def run(self, client, message, type, params):
         pass
 
-    # Return string providing help description
+    # Send message providing help
     @abstractmethod
-    async def help(self):
+    async def help(self, client, message):
         pass
 
     async def error(self, client, message, output):

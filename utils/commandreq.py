@@ -39,7 +39,7 @@ class CommandRequest(object):
                 skp_len -= 1
                 continue
             # Unsplit parts with escape characters
-            msg_splt[i], skp_len = self.recursive_remove_escape_chars("\\", '"', msg_splt[i:], 0)
+            msg_splt[i], skp_len = self.recursive_remove_escape_chars(escp_char, splt_char, msg_splt[i:], 0)
         for i in range(len(delete_indices)):
             msg_splt.pop(delete_indices[i])
             for j in range(len(delete_indices)):
