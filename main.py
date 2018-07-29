@@ -1,5 +1,6 @@
 import discord
 import asyncio
+import random
 from commands.gwhat import GWhat
 from commands.oobify import Oobify
 from commands.help import Help
@@ -9,6 +10,7 @@ CMD_CHAR = "!"
 
 command_list = []
 command_names = []
+rta_names = ["Apoorva", "Nick", "Brian", "Michael", "Dean Antoine", "Amy", "Rajas", "Melissa", "Siddhi", "Ryan", "Pragya"]
 
 client = discord.Client()
 
@@ -35,10 +37,17 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    if message.author == client.user:
+        return
     if message.content.startswith(CMD_CHAR):
         req = CommandRequest(message.content)
         cmd_index = (command_names.index(req.type) if req.type in command_names else None)
         await command_list[cmd_index].run(client, message, req.type, req.params)
+    if ("sad" in message.content.lower()):
+        await client.send_message(message.channel, "This is so sad; Alexa play Despacito")
+    if ("coke" in message.content.lower()):
+        await client.send_message(message.channel, str(random.choice(rta_names)) +
+        " takes the coke away.\nNo coke for you " + message.author.mention + "!")
 
 build_commands()
 client.run(get_token())
