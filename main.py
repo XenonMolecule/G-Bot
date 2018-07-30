@@ -4,9 +4,13 @@ import random
 from commands.gwhat import GWhat
 from commands.oobify import Oobify
 from commands.help import Help
+
 from utils.commandreq import CommandRequest
 
+from status.despacito import Despacito
+
 CMD_CHAR = "!"
+BOT_STATUS = Despacito()
 
 command_list = []
 command_names = []
@@ -34,6 +38,7 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
+    await client.change_presence(game=BOT_STATUS)
 
 @client.event
 async def on_message(message):
