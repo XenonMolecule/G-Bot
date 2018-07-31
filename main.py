@@ -3,7 +3,9 @@ import asyncio
 import random
 from commands.gwhat import GWhat
 from commands.oobify import Oobify
+from commands.altcaps import AltCaps
 from commands.help import Help
+
 
 from utils.commandreq import CommandRequest
 
@@ -21,7 +23,7 @@ client = discord.Client()
 def build_commands():
     global command_list
     global command_names
-    command_list = [GWhat(), Oobify()]
+    command_list = [GWhat(), Oobify(), AltCaps()]
     help_cmd = Help(command_list)
     command_list.append(help_cmd)
     command_names = [x.name for x in command_list]
